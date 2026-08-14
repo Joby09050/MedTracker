@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="auth-container auth-wide">
+    <div class="card">
+        <h2 class="card-title">Join as a Doctor</h2>
+        <p class="card-subtitle">Your account will require admin approval before you can practice.</p>
+
+        <form method="POST" novalidate>
+            {% csrf_token %}
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.name.id_for_label }}">Full Name</label>
+                    {{ form.name }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.email.id_for_label }}">Email Address</label>
+                    {{ form.email }}
+                    {% if form.email.errors %}<div class="form-error">{{ form.email.errors|striptags }}</div>{% endif %}
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.specialization.id_for_label }}">Specialization</label>
+                    {{ form.specialization }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.registration_number.id_for_label }}">Medical Registration No.</label>
+                    {{ form.registration_number }}
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.password.id_for_label }}">Password</label>
+                    {{ form.password }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.confirm_password.id_for_label }}">Confirm Password</label>
+                    {{ form.confirm_password }}
+                    {% if form.non_field_errors %}<div class="form-error">{{ form.non_field_errors|striptags }}</div>{% endif %}
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Register as Doctor</button>
+        </form>
+
+        <div class="auth-links">
+            Already have an account? <a href="{% url 'login' %}">Login here</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

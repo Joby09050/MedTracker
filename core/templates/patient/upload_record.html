@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<a href="{% url 'patient_dashboard' %}" class="btn btn-auto btn-sm" style="margin-bottom: var(--space-5);">&larr; Back to Dashboard</a>
+
+<div class="page-header">
+    <h1 class="page-title">Upload a record</h1>
+    <p class="page-subtitle">Add a document to your secure personal locker. PDF, JPG or PNG — max 10MB.</p>
+</div>
+
+<div class="card" style="max-width: 620px; margin: 0 auto;">
+    <form method="POST" enctype="multipart/form-data" id="upload-form">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label class="form-label" for="{{ form.record_type.id_for_label }}">Record Type</label>
+            {{ form.record_type }}
+            {% if form.record_type.errors %}<div class="form-error">{{ form.record_type.errors|striptags }}</div>{% endif %}
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="{{ form.title.id_for_label }}">Document Title</label>
+            {{ form.title }}
+            {% if form.title.errors %}<div class="form-error">{{ form.title.errors|striptags }}</div>{% endif %}
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="{{ form.description.id_for_label }}">Description (Optional)</label>
+            {{ form.description }}
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Select File</label>
+            <label class="upload-dropzone" id="dropzone" for="{{ form.file.id_for_label }}">
+                <span class="upload-dropzone-icon-wrap" aria-hidden="true">
+                    <svg class="upload-dropzone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="12" y1="18" x2="12" y2="12"></line>
+                        <polyline points="9 15 12 12 15 15"></polyline>
+                    </svg>
+                </span>
+                <div class="upload-dropzone-copy">
+                    <div class="upload-dropzone-title">Drag &amp; drop a file, or click to browse</div>
+                    <div class="upload-dropzone-hint">PDF, JPG or PNG · up to 10MB</div>
+                </div>
+                <div class="upload-filename" id="upload-filename"></div>
+            </label>
+            {{ form.file }}
+            {% if form.file.errors %}<div class="form-error">{{ form.file.errors|striptags }}</div>{% endif %}
+        </div>
+
+        <button type="submit" class="btn btn-primary">Upload Securely</button>
+    </form>
+</div>
+
+<style>
+    #{{ form.file.id_for_label }} { display: none; }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('{{ form.file.id_for_label }}');
+        const filenameLabel = document.getElementById('upload-filename');
+
+        function showFilename(name) {
+            if (name) {
+                filenameLabel.textContent = 'Selected: ' + name;
+                filenameLabel.style.display = 'block';
+            }
+        }
+
+        if (fileInput) {
+            fileInput.addEventListener('change', function () {
+                if (this.files && this.files.length) { showFilename(this.files[0].name); }
+            });
+        }
+
+        ['dragenter', 'dragover'].forEach(evt => {
+            dropzone.addEventListener(evt, function (e) {
+                e.preventDefault();
+                dropzone.classList.add('is-dragover');
+            });
+        });
+
+        ['dragleave', 'drop'].forEach(evt => {
+            dropzone.addEventListener(evt, function (e) {
+                e.preventDefault();
+                dropzone.classList.remove('is-dragover');
+            });
+        });
+
+        dropzone.addEventListener('drop', function (e) {
+            const dt = e.dataTransfer;
+            if (dt && dt.files && dt.files.length) {
+                fileInput.files = dt.files;
+                showFilename(dt.files[0].name);
+            }
+        });
+    });
+</script>
+{% endblock %}

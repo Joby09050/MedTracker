@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Admin Overview</h1>
+    <p class="page-subtitle">Locker-wide status and activity.</p>
+</div>
+
+<div class="dashboard-grid">
+    <div class="sidebar-col">
+        <div class="card">
+            <h3 style="margin-bottom: var(--space-5); font-size: var(--fs-md);">System Stats</h3>
+
+            <div class="stat-inline">
+                <div class="stat-label">Total Patients</div>
+                <div class="stat-value">{{ stats.total_patients }}</div>
+            </div>
+            <div class="stat-inline">
+                <div class="stat-label">Total Doctors</div>
+                <div class="stat-value">{{ stats.total_doctors }}</div>
+            </div>
+            <div class="stat-inline">
+                <div class="stat-label">Total Records</div>
+                <div class="stat-value">{{ stats.total_records }}</div>
+            </div>
+            <div class="stat-inline">
+                <div class="stat-label">Active Consents</div>
+                <div class="stat-value">{{ stats.active_consents }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-col">
+        <h2 class="section-title">Pending Approvals</h2>
+
+        {% if pending_doctors %}
+            <div class="grid-cards section-block">
+                {% for doctor in pending_doctors %}
+                    <div class="record-card" style="border-top-color: var(--clr-warning);">
+                        <h3 style="font-size: var(--fs-base); margin-bottom: var(--space-2);">Dr. {{ doctor.user_info.name }}</h3>
+                        <p style="margin-bottom: 2px; flex-grow: 0;">{{ doctor.specialization }}</p>
+                        <p style="color: var(--clr-text-muted); font-size: var(--fs-xs); margin-bottom: var(--space-5); flex-grow: 0;">Reg: {{ doctor.registration_number }}</p>
+
+                        <div class="row-actions" style="margin-top: auto;">
+                            <a href="{% url 'admin_approve_doctor' doctor.id %}" class="btn btn-primary btn-sm">Approve</a>
+                            <a href="{% url 'admin_reject_doctor' doctor.id %}" class="btn btn-danger-outline btn-sm">Reject</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state section-block">
+                No doctors are currently pending approval.
+            </div>
+        {% endif %}
+
+        <h2 class="section-title">System Activity Log</h2>
+
+        <!-- Filter Buttons -->
+        <div class="filter-bar" id="log-filter-buttons">
+            <button class="filter-pill active" data-filter="all">All Activity</button>
+            <button class="filter-pill" data-filter="LOGIN">Logins</button>
+            <button class="filter-pill" data-filter="UPLOAD">Records</button>
+            <button class="filter-pill" data-filter="CONSENT">Consents</button>
+        </div>
+
+        <div class="card card-flush">
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Actor</th>
+                            <th>Action</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody id="log-table-body">
+                        {% for log in recent_logs %}
+                            <tr class="log-row" data-type="{{ log.action_type }}">
+                                <td style="color: var(--clr-text-muted);">{{ log.timestamp|date:"M d, H:i" }}</td>
+                                <td>
+                                    {% if log.actor.role == 'admin' %}Admin
+                                    {% elif log.actor.role == 'doctor' %}Dr. {{ log.actor.user_info.name|default:"Unknown" }}
+                                    {% else %}Pt. {{ log.actor.user_info.name|default:"Unknown" }}
+                                    {% endif %}
+                                </td>
+                                <td><span class="tag" style="margin: 0;">{{ log.action_type }}</span></td>
+                                <td style="color: var(--clr-text-secondary);">{{ log.details }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="4" style="padding: var(--space-6); text-align: center; color: var(--clr-text-muted);">No recent activity.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const buttons = document.querySelectorAll('#log-filter-buttons .filter-pill');
+        const rows = document.querySelectorAll('.log-row');
+
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                buttons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+
+                const filterValue = button.getAttribute('data-filter');
+
+                rows.forEach(row => {
+                    if (filterValue === 'all' || row.getAttribute('data-type').includes(filterValue)) {
+                        row.style.display = 'table-row';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        });
+    });
+</script>
+{% endblock %}

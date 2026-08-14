@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Welcome, Dr. {{ doctor_profile.user_info.name }}</h1>
+    <p class="page-subtitle">{{ doctor_profile.specialization }}</p>
+</div>
+
+<div class="dashboard-grid">
+    <div class="sidebar-col stack">
+        <div class="card">
+            <div class="identity-row">
+                {% if doctor_profile.user_info.profile_pic %}
+                    <img src="{{ doctor_profile.user_info.profile_pic.url }}" alt="Dr. {{ doctor_profile.user_info.name }}" class="avatar avatar-sm">
+                {% else %}
+                    <div class="avatar-placeholder avatar-sm">{{ doctor_profile.user_info.name.0|upper }}</div>
+                {% endif %}
+                <div>
+                    <h3 style="margin-bottom: 0; font-size: var(--fs-md);">Dr. {{ doctor_profile.user_info.name }}</h3>
+                    <p style="margin: 0; font-size: var(--fs-sm);">{{ doctor_profile.specialization }}</p>
+                </div>
+            </div>
+
+            <a href="{% url 'doctor_settings' %}" class="btn btn-sm" style="margin-top: var(--space-4); margin-bottom: var(--space-4);">Profile Settings</a>
+
+            <hr style="margin-bottom: var(--space-4);">
+
+            {% if not doctor_profile.is_approved %}
+                <div class="status-banner is-pending">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    Account pending admin approval. You can't request access or view patients yet.
+                </div>
+            {% else %}
+                <div class="status-banner is-verified">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                    Account verified
+                </div>
+
+                <h4 style="margin-bottom: var(--space-3); font-size: var(--fs-base);">Find Patient</h4>
+                <form method="GET">
+                    <div class="form-group" style="display: flex; gap: var(--space-2); margin-bottom: var(--space-2);">
+                        <input type="text" name="search" class="form-control" placeholder="Global Health ID" value="{{ search_query }}" required>
+                        <button type="submit" class="btn btn-primary btn-auto" style="padding: 0.7rem 1rem;">Search</button>
+                    </div>
+                </form>
+
+                {% if search_query %}
+                    <div class="card card-tight" style="background-color: var(--clr-surface-sunken); margin-top: var(--space-3);">
+                        {% if search_results %}
+                            {% for p in search_results %}
+                                <div style="margin-bottom: var(--space-3);">
+                                    <strong>{{ p.name }}</strong><br>
+                                    <span style="font-size: var(--fs-xs); color: var(--clr-text-muted);">ID: {{ p.global_health_id }}</span>
+                                </div>
+                                <a href="{% url 'doctor_request_consent' p.id %}" class="btn btn-sm">Request Access</a>
+                            {% endfor %}
+                        {% else %}
+                            <p style="font-size: var(--fs-sm); text-align: center; margin: 0;">No patient found.</p>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="main-col">
+        {% if doctor_profile.is_approved %}
+            <h2 class="section-title">
+                Active Patients
+                <span class="section-title-hint">Consented</span>
+            </h2>
+
+            <div class="grid-cards section-block">
+                {% for consent in active_consents %}
+                    <div class="record-card">
+                        <h3 style="font-size: var(--fs-base); margin-bottom: 2px;">{{ consent.patient.name }}</h3>
+                        <p style="margin-bottom: var(--space-5); flex-grow: 0;">ID: {{ consent.patient.global_health_id }}</p>
+                        <a href="{% url 'doctor_patient_record' consent.patient.id %}" class="btn btn-primary">View Records &amp; Prescribe</a>
+                    </div>
+                {% empty %}
+                    <div class="empty-state empty-state-inline" style="grid-column: 1 / -1;">
+                        You don't have active access to any patients yet.
+                    </div>
+                {% endfor %}
+            </div>
+
+            <h2 class="section-title">Pending Requests</h2>
+            {% if pending_requests %}
+                <div class="stack">
+                    {% for req in pending_requests %}
+                        <div class="card card-tight" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--space-2);">
+                            <div>
+                                <strong>{{ req.patient.name }}</strong>
+                                <div style="font-size: var(--fs-xs); color: var(--clr-text-muted);">Requested: {{ req.requested_at|date:"M d, Y" }}</div>
+                            </div>
+                            <span class="tag tag-warning" style="margin: 0;">Pending</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p style="color: var(--clr-text-muted);">No pending requests.</p>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
