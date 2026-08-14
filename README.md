@@ -1,75 +1,194 @@
-anyio==4.9.0
-asgiref==3.12.1
-attrs==25.4.0
-bcrypt==5.0.0
-blinker==1.9.0
-certifi==2025.11.12
-cffi==2.0.0
-charset-normalizer==3.4.4
-click==8.3.1
-colorama==0.4.6
-contourpy==1.3.3
-cryptography==46.0.6
-cycler==0.12.1
-Django==5.0
-dnspython==2.8.0
-Flask==3.1.0
-Flask-Cors==4.0.1
-Flask-SQLAlchemy==3.1.1
-fonttools==4.63.0
-fpdf==1.7.2
-greenlet==3.5.3
-h11==0.16.0
-httpcore==1.0.9
-httpx==0.25.2
-idna==3.10
-itsdangerous==2.2.0
-Jinja2==3.1.6
-joblib==1.5.3
-kiwisolver==1.5.0
-MarkupSafe==3.0.3
-matplotlib==3.11.1
-mysql-connector==2.2.9
-mysql-connector-python==9.1.0
-mysqlclient==2.2.1
-narwhals==2.24.0
-numpy==2.5.2
-outcome==1.3.0.post0
-packaging==25.0
-pandas==3.0.5
-pillow==12.3.0
-prompt_toolkit==3.0.53
-pycparser==2.23
-pymongo==4.7.2
-PyMySQL==1.2.0
-pyparsing==3.3.2
-PySocks==1.7.1
-python-dateutil==2.9.0.post0
-python-dotenv==1.1.0
-python-telegram-bot==20.7
-pywin32==311
-requests==2.32.5
-scikit-learn==1.9.0
-scipy==1.18.0
-selenium==4.38.0
-six==1.17.0
-sniffio==1.3.1
-sortedcontainers==2.4.0
-SQLAlchemy==2.0.51
-sqlparse==0.5.5
-telegram==0.0.1
-threadpoolctl==3.6.0
-trio==0.32.0
-trio-websocket==0.12.2
-typing_extensions==4.15.0
-tzdata==2026.3
-urllib3==2.5.0
-wcwidth==0.8.2
-webdriver-manager==4.0.2
-websocket-client==1.9.0
-Werkzeug==3.1.7
-winrt-runtime==3.2.1
-winrt-Windows.Foundation==3.2.1
-winrt-Windows.Security.Credentials.UI==3.2.1
-winsdk==1.0.0b10
-wsproto==1.3.2
+# Medlocker - Medical Record Management System
+
+A Django-based web application for managing medical records securely. Medlocker allows doctors and patients to interact, share, and store medical information in a centralized, secure platform.
+
+## Project Overview
+
+Medlocker is a healthcare platform that bridges the gap between doctors and patients by providing:
+- **Secure Authentication**: Separate registration and login for doctors and patients
+- **Medical Records Management**: Upload, store, and retrieve patient medical records
+- **Role-Based Dashboard**: Different interfaces for doctors and patients
+- **Patient Profiles**: Store patient information including blood group and emergency contacts
+- **Profile Pictures**: User profile photo support
+- **Doctor-Patient Interaction**: Doctors can view and manage patient records
+
+## Features
+
+- 👨‍⚕️ **Doctor Dashboard**: View assigned patients and their medical records
+- 👤 **Patient Dashboard**: Manage personal health records and upload documents
+- 📋 **Medical Records**: Upload and manage patient medical documents
+- 👥 **User Profiles**: Store blood group, emergency contacts, and profile pictures
+- 🔐 **Secure Authentication**: Role-based user authentication for doctors and patients
+- ⚙️ **Settings Management**: User-specific settings and preferences
+
+## Tech Stack
+
+- **Backend**: Django (Python)
+- **Database**: SQLite (default) / PostgreSQL (configurable)
+- **Frontend**: HTML, CSS, JavaScript
+- **Static Files**: CSS, Images
+- **Media Storage**: Local file system
+
+## Project Structure
+
+```
+Medlocker/
+├── manage.py                 # Django management script
+├── requirements.txt          # Python dependencies
+├── core/                     # Main application
+│   ├── models.py            # Database models
+│   ├── views.py             # View logic
+│   ├── forms.py             # Form definitions
+│   ├── urls.py              # URL routing
+│   ├── admin.py             # Admin interface
+│   ├── middleware.py        # Custom middleware
+│   ├── decorators.py        # Custom decorators
+│   ├── migrations/          # Database migrations
+│   ├── templates/           # HTML templates
+│   │   ├── auth/           # Login & registration templates
+│   │   ├── doctor/         # Doctor-specific templates
+│   │   ├── patient/        # Patient-specific templates
+│   │   └── admin/          # Admin templates
+│   └── static/             # CSS and static files
+├── medtrack_project/        # Django project configuration
+│   ├── settings.py         # Project settings
+│   ├── urls.py             # Main URL routing
+│   ├── wsgi.py             # WSGI configuration
+│   └── asgi.py             # ASGI configuration
+└── media/                   # User-uploaded files
+    ├── patient_*/          # Patient-specific records
+    └── profile_pics/       # User profile pictures
+```
+
+## Installation
+
+### Prerequisites
+
+- Python 3.8 or higher
+- pip (Python package manager)
+- Virtual environment (recommended)
+
+### Setup Instructions
+
+1. **Clone the repository**
+   ```bash
+   cd Medlocker
+   ```
+
+2. **Create and activate virtual environment**
+   ```bash
+   python -m venv venv
+   
+   # On Windows
+   venv\Scripts\activate
+   
+   # On macOS/Linux
+   source venv/bin/activate
+   ```
+
+3. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Apply database migrations**
+   ```bash
+   python manage.py migrate
+   ```
+
+5. **Create a superuser (admin account)**
+   ```bash
+   python manage.py createsuperuser
+   ```
+
+6. **Collect static files**
+   ```bash
+   python manage.py collectstatic
+   ```
+
+## Running the Application
+
+### Development Server
+
+```bash
+python manage.py runserver
+```
+
+The application will be available at `http://localhost:8000`
+
+### Access Points
+
+- **Home/Admin**: http://localhost:8000/admin
+- **Login**: http://localhost:8000/auth/login
+- **Patient Registration**: http://localhost:8000/auth/register/patient
+- **Doctor Registration**: http://localhost:8000/auth/register/doctor
+
+## Authentication
+
+### Patient Registration
+- Users register as patients to upload and manage their medical records
+- Profile includes blood type, emergency contact, and profile picture
+
+### Doctor Registration
+- Licensed professionals register as doctors
+- Access to view assigned patient records
+- Can manage patient medical information
+
+## Database Models
+
+The application includes models for:
+- **User**: Extended user model with role-based access
+- **UserInfo**: Patient information (blood group, emergency contact, profile picture)
+- **Medical Records**: Patient document storage
+- **Doctor-Patient Relationships**: Link between doctors and their patients
+
+## Configuration
+
+Edit `medtrack_project/settings.py` to configure:
+- Database settings
+- Allowed hosts
+- Static and media file paths
+- Email configuration
+- Security settings
+
+## API Endpoints & Routes
+
+Refer to `core/urls.py` for detailed URL routing configuration.
+
+## Deployment
+
+For production deployment:
+1. Set `DEBUG = False` in settings.py
+2. Configure a production database (PostgreSQL recommended)
+3. Set up a web server (Gunicorn, uWSGI)
+4. Configure a reverse proxy (Nginx)
+5. Enable HTTPS and secure headers
+6. Store media files in cloud storage (AWS S3, Azure Blob)
+
+## Security Considerations
+
+- ✅ Use strong SECRET_KEY in production
+- ✅ Enable CSRF protection
+- ✅ Use HTTPS in production
+- ✅ Implement proper access controls
+- ✅ Sanitize user inputs
+- ✅ Secure media file access
+
+## Contributing
+
+1. Create a feature branch
+2. Make your changes
+3. Write/update tests
+4. Submit a pull request
+
+## License
+
+This project is private and proprietary. All rights reserved.
+
+## Support
+
+For issues, questions, or suggestions, please contact the development team.
+
+---
+
+**Last Updated**: 2026-08-14
